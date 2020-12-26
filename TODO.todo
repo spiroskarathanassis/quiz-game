@@ -8,4 +8,8 @@
 ☐ add buttons when finished ['Play Again', 'Terminate']
 ☐ add Home Page
 ☐ split to components
+☐ compress images to avif and compare its size
+☐ add webpack and build it
+☐ move it to personal website
+
 
