@@ -1,0 +1,11 @@
+√ measure points
+√ coloring correct and wrong answers & message
+√ set message
+√ edit styles
+√ check points
+√ display results
+☐ convert to vue3
+☐ add buttons when finished ['Play Again', 'Terminate']
+☐ add Home Page
+☐ split to components
+
