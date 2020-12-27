@@ -3,6 +3,7 @@
 ### Tools
 - Handle (questions & results) json data from firebase api
 - Compress images to webp format from squoosh cli package
+- Used SCSS style
  
 ### Description
 - Get question data from firebase-live-database: apis-game

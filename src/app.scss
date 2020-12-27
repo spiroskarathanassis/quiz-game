@@ -1,0 +1,139 @@
+$fontColor: rgb(171, 163, 152);
+$bodyColor: rgb(28, 31, 32);
+$answerColor: rgb(250 128 98 / 1);
+$answerHoverColor: rgb(50 47 47 / 90%);
+$answerActive: rgb(80 47 47 / 90%);
+$containerColor: rgb(24, 26, 27);
+$salmon: salmon;
+$nextBtn: rgb(0 0 0 / 90%);
+$nextBtnHover: rgb(110 109 109);
+$pageFontSize: 14px;
+
+$correctAnswer: rgb(120 141 120 / 95%);
+$wrongAnswer: rgb(230 10 10 / 0.90);
+
+@mixin flexbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@mixin btn {
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 1em;
+  outline: none;
+
+  &:enabled {
+    cursor: pointer;
+  }
+}
+
+*, *::before, *::after, body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  @include flexbox;
+
+  font-family: Sans-serif;
+  font-size: $pageFontSize;
+  background-color: $bodyColor;
+  width: 100vw;
+  height: 100vh;
+  color: $fontColor;
+}
+.container {
+  max-width: 40rem; //600px
+  background-color: $containerColor;
+  border-radius: 16px;
+  border-color: rgba(140, 130, 115, 0.12);
+  box-shadow: rgb(48 52 54 / 0.3) 0px 0px 20px 8px;
+  padding: 1rem;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.question-number {
+  font-size: $pageFontSize + 2px;
+  font-weight: 800;
+  margin: 1rem 0;
+  text-align: center;
+  background: $fontColor;
+  color: $containerColor;
+}
+.result-title {
+  text-align: center;
+  font-family: fantasy;
+  font-size: medium;
+}
+img {
+  width: 100%;
+  margin: 4px 0;
+}
+.message {
+  font-size: 0.8em;
+  text-align: center;
+  font-weight: bold;
+}
+.container-answers {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 10px;
+  margin: 20px 2px;
+}
+.score-message {
+  @include flexbox;
+
+  margin: 1rem 0;
+  color: rgb(143 220 66 / 92%);
+}
+.answer-btn {
+  @include btn;
+
+  background-color: $answerColor;
+  border: 2px solid $answerColor;
+  color: $containerColor;
+
+  &:hover {
+    border-color: $answerHoverColor;
+    background: $answerHoverColor;
+    color: $salmon;
+  }
+  &.active {
+    background-color: $answerActive;
+    border-color: $answerActive;
+    color: $salmon;
+  }
+  &.correct {
+    background-color: $correctAnswer;
+    border-color: $correctAnswer;
+  }
+  &.wrong {
+    background-color: $wrongAnswer;
+    border-color: $wrongAnswer;
+  }
+}
+.tool-btn {
+  @include btn;
+
+  border: 2px solid $nextBtn;
+  background-color: $nextBtn;
+  color: $salmon;
+  float: right;
+  padding: 6px 20px;
+
+  &:hover:enabled {
+    background-color: $nextBtnHover;
+    border-color: $nextBtnHover;
+  }
+
+  &.start {
+    float: unset;
+  }
+}
+.start-ctl {
+  @include flexbox;
+
+  margin: 4rem 0;
+}

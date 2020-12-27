@@ -4,12 +4,9 @@
 √ edit styles
 √ check points
 √ display results
-☐ convert to vue3
-☐ add buttons when finished ['Play Again', 'Terminate']
-☐ add Home Page
-☐ split to components
+√ add buttons when finished ['Play Again', 'Start']
+√ add Home Page
 ☐ compress images to avif and compare its size
-☐ add webpack and build it
+☐ split to components
 ☐ move it to personal website
-
-
+☐ migrate to vue3
