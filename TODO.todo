@@ -6,7 +6,6 @@
 √ display results
 √ add buttons when finished ['Play Again', 'Start']
 √ add Home Page
-☐ compress images to avif and compare its size
-☐ split to components
-☐ move it to personal website
+√ split to components
 ☐ migrate to vue3
+☐ move it to personal website
