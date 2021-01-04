@@ -1,4 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import ControlButton from './components/ControlButton.vue';
 
-createApp(App).mount('#quiz')
+const app = createApp(App);
+
+app.component('ControlButton', ControlButton);
+app.mount('#quiz');

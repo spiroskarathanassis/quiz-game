@@ -3,12 +3,12 @@
   <div v-else class="container">
     <template v-if="!isQuizActive">
       <div>{{ quiz.title }}</div>
-      <div class="conrtols start-ctl">
+      <control-button extraClass="start-ctl">
         <button
           @click="setComponent('question')" 
           class="tool-btn start"
         >Start</button>
-      </div>
+      </control-button>
     </template>
     <question 
       v-else-if="displayedComponent == 'question'"
@@ -29,7 +29,7 @@ export default {
   name: 'App',
   components: {
     Question,
-    Result
+    Result,
   },
   data () {
     return {

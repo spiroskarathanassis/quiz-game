@@ -3,11 +3,11 @@
   <img :src="result.imageSrc" alt="" />
   <p class="message">{{ result.message }}</p>
   <div class="score-message">Your score is {{ score }} %</div>
-  <div class="conrtols">
+  <control-button>
     <button
       @click="resetQuiz"
       class="tool-btn start">Play Again</button>
-  </div>
+  </control-button>
 </template>
 
 <script>

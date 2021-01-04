@@ -28,13 +28,13 @@
     >{{ question.type !== 'truefalse' ? ans.caption : ans }}</button>
   </div>
 
-  <div class="conrtols">
+  <control-button>
     <button
       @click="setNextQuestion" 
       :disabled="isBtnDisabled"
       class="tool-btn"
     >{{ (question.currentIndex !== (totalQuestions - 1)) ? 'Next' : 'Finish' }}</button>
-  </div>
+  </control-button>
 </template>
 
 <script>
