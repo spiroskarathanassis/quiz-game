@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import Question from './components/Questions.vue';
+import Question from './components/Question.vue';
 import Result from './components/Result.vue';
 
 export default {
