@@ -15,7 +15,7 @@ export default {
   name: 'Result',
   props: ['quizData', 'totalScore'],
   emits: ['reset-quiz'],
-  created () {
+  mounted () {
     this.displayResults();
   },
   data () {
