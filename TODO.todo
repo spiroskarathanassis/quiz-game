@@ -7,5 +7,5 @@
 √ add buttons when finished ['Play Again', 'Start']
 √ add Home Page
 √ split to components
-☐ migrate to vue3
+√ migrate to vue3
 ☐ move it to personal website

@@ -2,7 +2,7 @@
   <div v-if="errorMessage.length > 0" style="color: red">{{ errorMessage }} <b>!</b></div>
   <div v-else class="container">
     <template v-if="!isQuizActive">
-      <div>{{ quiz.title }}</div>
+      <div>{{ quiz.data?.title ?? '' }}</div>
       <control-button extraClass="start-ctl">
         <button
           @click="setComponent('question')" 
@@ -10,7 +10,7 @@
         >Start</button>
       </control-button>
     </template>
-    <question 
+    <question
       v-else-if="displayedComponent == 'question'"
       :quiz-data="quiz.data.questions"
       @print-results="prepareResults" />
@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { ref, reactive, onBeforeMount } from 'vue';
+
 import Question from './components/Question.vue';
 import Result from './components/Result.vue';
 
@@ -31,53 +33,60 @@ export default {
     Question,
     Result,
   },
-  data () {
-    return {
-      isQuizActive: false,
-      displayedComponent: 'question',
-      errorMessage: '',
-      quiz: {
-        title: '',
-        data: '',
-      },
-      totalScore: 0
-    }
-  },
-  async created () {
-    this.quiz.data = await this.fetchQuizData(false); //questionsc
-    this.quiz.title = this.quiz.data.title;
-  },
-  methods: {
-    fetchQuizData(isGameFinished) {
+  setup () {
+    const errorMessage = ref('');
+    const isQuizActive = ref('');
+    const displayedComponent = ref('question');
+    const totalScore = ref(0);
+    const quiz = reactive({
+      data: null
+    });
+
+    const fetchQuizData = async (isGameFinished) => {
       const statement = isGameFinished ? 'results' : 'questions';
       const baseUrl = 'https://apis-game-default-rtdb.europe-west1.firebasedatabase.app/apis-game-default-rtdb/';
 
-      return fetch(baseUrl + statement + '.json')
+      return await fetch(baseUrl + statement + '.json')
         .then(res => res.json())
         .then(res => res)
-        .catch(e => {
-          // console.error(e.message);
-          this.errorMessage = 'Cannot fetch quiz data from api';
-        });
-    },
-    setComponent(cmp) {
-      this.isQuizActive = true;
-      this.displayedComponent = cmp;
-    },
-    async prepareResults({results, errorMsg}) {
+        .catch(e => errorMessage.value = 'Cannot fetch quiz data from api');
+    }
+    
+    onBeforeMount(async () => {
+      quiz.data = await fetchQuizData(false); //questions
+    })
+
+    const setComponent = cmp => {
+      isQuizActive.value = true;
+      displayedComponent.value = cmp;
+    };
+
+    const prepareResults = async ({results, errorMsg}) => {
       if (errorMsg != null) {
-        this.errorMessage = errorMsg;
+        errorMessage.value = errorMsg;
         return;
       }
       
-      this.quiz.data = await this.fetchQuizData(true); //results
-      this.setComponent('result');
-      this.totalScore = results;
-    },
-    async resetQuiz() {
-      this.quiz.data = await this.fetchQuizData(false); //questions
-      this.setComponent('question');
-    }
+      quiz.data = await fetchQuizData(true); //results
+      setComponent('result');
+      totalScore.value = results;
+    };
+
+    const resetQuiz = async () => {
+      quiz.data = await fetchQuizData(false); //questions
+      setComponent('question');
+    };
+
+    return {
+      isQuizActive,
+      displayedComponent,
+      errorMessage,
+      quiz,
+      totalScore,
+      setComponent,
+      prepareResults,
+      resetQuiz
+    };
   }
 }
 </script>

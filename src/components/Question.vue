@@ -18,7 +18,7 @@
       :value="index"
       :data-id="question.type === 'truefalse' ? !index : ans.a_id"
       data-selected="false"
-      @click="this.toggleAnswers"
+      @click="(e) => toggleAnswers(e)"
       :class="[
         {correct: answer.isCorrect && answer.classNames[index]}, 
         {wrong: !answer.isCorrect && answer.classNames[index]}, 
@@ -38,134 +38,143 @@
 </template>
 
 <script>
+import { ref, reactive, computed, onBeforeMount } from 'vue';
+
 export default {
   name: 'Question',
   props: ['quizData'],
   emits: ['print-results'],
-  data () {
-    return {
-      totalQuestions: null,
-      previousAnswerIndex: null,
-      isAnswerActive: [], //all answers indexing by loop 1-4
-      isBtnDisabled: true,
-      points: {
-        player: 0,
-        totalGame: 0
-      },
-      question: {
-        currentIndex: 0,
-        type: '',
-        title: '',
-        imageSrc: '',
-        points: '',
-        possibleAnswers: []
-      },
-      message: {
-        isEnabled: false,
-        isAnswerCorrect: false,
-        text: ''
-      },
-      answer: {
-        classNames: [],
-        isCorrect: false,
-      },
-    }
-  },
-  created () {
-    this.totalQuestions = this.quizData.length;
-    this.displayQuestion();
-  },
-  methods: {
-    displayQuestion() {
-      const questionIndex = this.quizData[this.question.currentIndex];
-      this.question.type = questionIndex.question_type;
-      this.question.title = questionIndex.title;
-      this.question.imageSrc = require('@/assets/' + questionIndex.img);
-      this.question.possibleAnswers = (this.question.type === 'truefalse') 
+  setup (props, context) {
+    const totalQuestions = ref(0);
+    const previousAnswerIndex = ref('');
+    const isBtnDisabled = ref(true);
+    const isAnswerActive = ref([]); //all answers indexing by loop 1-4
+
+    const points = reactive({
+      player: 0,
+      totalGame: 0
+    });
+    const question = reactive({
+      currentIndex: 0,
+      type: '',
+      title: '',
+      imageSrc: '',
+      points: '',
+      possibleAnswers: []
+    });
+    const answer = reactive({
+      classNames: [],
+      isCorrect: false,
+    });
+    const message = reactive({
+      isEnabled: false,
+      isAnswerCorrect: false,
+      text: ''
+    });
+
+    onBeforeMount(() => {
+      totalQuestions.value = props.quizData.length;
+      displayQuestion();
+    });
+
+    const displayQuestion = () => {
+      const questionIndex = props.quizData[question.currentIndex];
+      question.type = questionIndex.question_type;
+      question.title = questionIndex.title;
+      question.imageSrc = require('@/assets/' + questionIndex.img);
+      question.possibleAnswers = (question.type === 'truefalse') 
         ? ['True', 'False'] 
         : questionIndex.possible_answers;
-      this.question.points = questionIndex.points;
-    },
-    async setNextQuestion() {
-      this.isBtnDisabled = true;
-      const isCorrect = this.compareAnswers();
-      this.addPoints(isCorrect);
-      this.postMessage(isCorrect);
-      this.displayCorrectAnswers(isCorrect);
+      question.points = questionIndex.points;
+    };
+    
+    const setNextQuestion = async () => {
+      isBtnDisabled.value = true;
+      const isCorrect = compareAnswers();
+      addPoints(isCorrect);
+      printMessage(isCorrect);
+      displayCorrectAnswers(isCorrect);
       
-      const isFinished = this.question.currentIndex >= (this.totalQuestions - 1);
-      await this.stopTime(isFinished);
-    },
-    postMessage(isCorrect) {
-      this.message.isEnabled = true;
-      this.message.isAnswerCorrect = isCorrect;
-    },
-    addPoints(isCorrect) {
-      if (isCorrect) {
-        this.points.player += this.question.points;
-      }
-      this.points.totalGame += this.question.points;
+      const isFinished = question.currentIndex >= (totalQuestions.value - 1);
+      await stopTime(isFinished);
+    };
+
+    const addPoints = isCorrect => {
+      if (isCorrect)
+        points.player += question.points;
+      points.totalGame += question.points;
       console.clear();
-      console.table(this.points);
-    },
-    uncheckAnswers() {
-      this.message.isEnabled = !this.message.isEnabled;
-      this.message.isAnswerCorrect = false;
-      this.isAnswerActive = [];
-      this.previousAnswerIndex = null;
-      this.answer.classNames = [];
-      this.answer.isCorrect = false;
-    },
-    async stopTime(isFinished) {
+      console.table(points);
+    };
+
+    const printMessage = isCorrect => {
+      message.isEnabled = true;
+      message.isAnswerCorrect = isCorrect;
+    };
+
+    const uncheckAnswers = () => {
+      message.isEnabled = !message.isEnabled;
+      message.isAnswerCorrect = false;
+      previousAnswerIndex.value = '';
+      isAnswerActive.value = [];
+      answer.classNames = [];
+      answer.isCorrect = false;
+    };
+
+    const stopTime = async (isFinished) => {
       await setTimeout(() => {
-        this.uncheckAnswers();
+        uncheckAnswers();
+        
         if (!isFinished) {
-          ++this.question.currentIndex;
-          this.displayQuestion();
+          ++question.currentIndex;
+          displayQuestion();
         } else {
-          this.prepareResults();
+          prepareResults();
         }
       }, 3000);
-    },
-    toggleAnswers(e) {
+    };
+
+    // avoid event with store
+    const toggleAnswers = e => {
       const isSelected = (e.target.getAttribute('data-selected') !== 'true');
 
       // toggle answers on one choice answer
-      if (this.question.type !== 'mutiplechoice-multiple') {
+      if (question.type !== 'mutiplechoice-multiple') {
         if (isSelected === false) return;
         
-        if (this.previousAnswerIndex !== null) {
+        if (previousAnswerIndex.value) {
           const buttons = document.querySelectorAll('#answers button');
-          buttons[this.previousAnswerIndex].setAttribute('data-selected', !isSelected);
-          this.isAnswerActive[this.previousAnswerIndex] = !isSelected;
+          buttons[previousAnswerIndex.value].setAttribute('data-selected', !isSelected);
+          isAnswerActive.value[previousAnswerIndex.value] = !isSelected;
         }
 
-        this.previousAnswerIndex = e.target.value;
+        previousAnswerIndex.value = e.target.value;
       }
 
       e.target.setAttribute('data-selected', isSelected);
-      this.isAnswerActive[e.target.value] = isSelected;
-      this.isBtnDisabled = !this.isAnswerActive.includes(true);
-      console.log(this.isAnswerActive);
-    },
-    compareAnswers() {
-      if (this.question.type !== 'mutiplechoice-multiple') {
-        const correctAnswer = this.quizData[this.question.currentIndex].correct_answer;
-        const answerIndex = this.isAnswerActive.findIndex(el => el === true);
+      isAnswerActive.value[e.target.value] = isSelected;
+      isBtnDisabled.value = !isAnswerActive.value.includes(true);
+      console.log(isAnswerActive.value);
+    };
 
-        if (this.question.type === 'truefalse') return !answerIndex == correctAnswer;
-        return (this.question.possibleAnswers[answerIndex].a_id === correctAnswer);
+    const compareAnswers = () => {
+      if (question.type !== 'mutiplechoice-multiple') {
+        const correctAnswer = props.quizData[question.currentIndex].correct_answer;
+        const answerIndex = isAnswerActive.value.findIndex(el => el === true);
+
+        if (question.type === 'truefalse') return !answerIndex == correctAnswer;
+        return (question.possibleAnswers[answerIndex].a_id === correctAnswer);
       }
 
       // case mutiplechoice-multiple below
-      const correctAnswers = this.quizData[this.question.currentIndex].correct_answer;
+      const correctAnswers = props.quizData[question.currentIndex].correct_answer;
       let sameAnswers = 0;
-      const numberOfAnswered = this.isAnswerActive.filter(el => el === true).length;
+      const numberOfAnswered = isAnswerActive.value.filter(el => el === true).length;
       
       correctAnswers.forEach(ans => {
-        this.isAnswerActive.map((el, index) => {
+        isAnswerActive.value.map((el, index) => {
           if (el === true) {
-            if (this.question.possibleAnswers[index].a_id === ans) sameAnswers++;
+            if (question.possibleAnswers[index].a_id === ans) sameAnswers++;
           }
 
           return el;
@@ -174,39 +183,55 @@ export default {
 
       return (sameAnswers === correctAnswers.length) 
        && (numberOfAnswered === correctAnswers.length);
-    },
-    displayCorrectAnswers(isCorrect) {
-      this.answer.isCorrect = isCorrect;
+    };
+
+    // avoid querySelector
+    const displayCorrectAnswers = isCorrect => {
+      answer.isCorrect = isCorrect;
       const buttons = document.querySelectorAll('#answers button');
       let correctAnswers = [];
 
-      if (this.question.type === 'mutiplechoice-multiple') {
-        correctAnswers = this.quizData[this.question.currentIndex].correct_answer;
+      if (question.type === 'mutiplechoice-multiple') {
+        correctAnswers = props.quizData[question.currentIndex].correct_answer;
       } else {
-        correctAnswers[0] = this.quizData[this.question.currentIndex].correct_answer;
+        correctAnswers[0] = props.quizData[question.currentIndex].correct_answer;
       }
 
       buttons.forEach((button, index) => {
         correctAnswers.forEach(ans => {
           if (button.getAttribute('data-id') === String(ans)) {
-            this.answer.classNames[index] = true;
+            answer.classNames[index] = true;
           }
         });
       });
-    },
-    prepareResults() {
+    };
+
+    const prepareResults = () => {
       let results = null;
       let errorMsg = null;
       
       try {
-        results = Math.floor(this.points.player * 100 / this.points.totalGame);
+        results = Math.floor(points.player * 100 / points.totalGame);
       } catch (e) {
         console.log(e.message);
         errorMsg = 'Something went wrong with game points';
       }
 
-      this.$emit('print-results', {results, errorMsg});
-    },
+      context.emit('print-results', {results, errorMsg});
+    };
+
+    return {
+      totalQuestions,
+      previousAnswerIndex,
+      isBtnDisabled,
+      isAnswerActive,
+      points,
+      question,
+      answer,
+      message,
+      setNextQuestion,
+      toggleAnswers
+    };
   },
 }
 </script>
