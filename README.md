@@ -1,10 +1,9 @@
 # Project Quiz Game
 
-## Preview
-<video>
-  <source src="./preview.demo.webm"
-    type="video/webm">
-</video>
+<div style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
+  <h2 style="color:#e4c652">Preview</h2>
+  <img src="./preview/demo.gif" width="300px"/>
+</div>
 
 ### Tools
 - Handle (questions & results) json data from firebase api
