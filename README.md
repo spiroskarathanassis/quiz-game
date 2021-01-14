@@ -2,7 +2,7 @@
 
 <div style="display:flex;justify-content:center;align-items:center;flex-direction:column;">
   <h2 style="color:#e4c652">Preview</h2>
-  <img src="./preview/demo.gif" width="300px"/>
+  <img src="./preview/demo.gif" width="400px"/>
 </div>
 
 ### Tools
