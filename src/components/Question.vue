@@ -17,7 +17,7 @@
       :key="question.type === 'truefalse' ? index : ans.a_id"
       :value="index"
       :data-id="question.type === 'truefalse' ? !index : ans.a_id"
-      data-selected="false"
+      :data-selected="answer.isCorrect"
       @click="(e) => toggleAnswers(e)"
       :class="[
         {correct: answer.isCorrect && answer.classNames[index]}, 
@@ -78,7 +78,7 @@ export default {
       displayQuestion();
     });
 
-    const displayQuestion = () => {
+    const displayQuestion = () => {console.log(buttons.value);
       const questionIndex = props.quizData[question.currentIndex];
       question.type = questionIndex.question_type;
       question.title = questionIndex.title;
@@ -135,7 +135,6 @@ export default {
       }, 3000);
     };
 
-    // avoid event with store
     const toggleAnswers = e => {
       const isSelected = (e.target.getAttribute('data-selected') !== 'true');
 
