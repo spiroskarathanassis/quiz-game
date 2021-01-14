@@ -11,7 +11,7 @@
     class="message"
   >{{ message.isAnswerCorrect ? 'Correct Answer' : 'Wrong Answer' }}</p>
 
-  <div id="answers" class="container-answers">
+  <div class="container-answers" ref="buttons">
     <button 
       v-for="(ans, index) in question.possibleAnswers"
       :key="question.type === 'truefalse' ? index : ans.a_id"
@@ -45,6 +45,7 @@ export default {
   props: ['quizData'],
   emits: ['print-results'],
   setup (props, context) {
+    const buttons = ref(null);
     const totalQuestions = ref(0);
     const previousAnswerIndex = ref('');
     const isBtnDisabled = ref(true);
@@ -143,8 +144,7 @@ export default {
         if (isSelected === false) return;
         
         if (previousAnswerIndex.value) {
-          const buttons = document.querySelectorAll('#answers button');
-          buttons[previousAnswerIndex.value].setAttribute('data-selected', !isSelected);
+          buttons.value.children[previousAnswerIndex.value].setAttribute('data-selected', !isSelected);
           isAnswerActive.value[previousAnswerIndex.value] = !isSelected;
         }
 
@@ -162,7 +162,9 @@ export default {
         const correctAnswer = props.quizData[question.currentIndex].correct_answer;
         const answerIndex = isAnswerActive.value.findIndex(el => el === true);
 
-        if (question.type === 'truefalse') return !answerIndex == correctAnswer;
+        if (question.type === 'truefalse') 
+          return !answerIndex == correctAnswer;
+        
         return (question.possibleAnswers[answerIndex].a_id === correctAnswer);
       }
 
@@ -182,13 +184,11 @@ export default {
       });
 
       return (sameAnswers === correctAnswers.length) 
-       && (numberOfAnswered === correctAnswers.length);
+        && (numberOfAnswered === correctAnswers.length);
     };
 
-    // avoid querySelector
     const displayCorrectAnswers = isCorrect => {
       answer.isCorrect = isCorrect;
-      const buttons = document.querySelectorAll('#answers button');
       let correctAnswers = [];
 
       if (question.type === 'mutiplechoice-multiple') {
@@ -197,7 +197,7 @@ export default {
         correctAnswers[0] = props.quizData[question.currentIndex].correct_answer;
       }
 
-      buttons.forEach((button, index) => {
+      buttons.value.children.forEach((button, index) => {
         correctAnswers.forEach(ans => {
           if (button.getAttribute('data-id') === String(ans)) {
             answer.classNames[index] = true;
@@ -221,6 +221,7 @@ export default {
     };
 
     return {
+      buttons,
       totalQuestions,
       previousAnswerIndex,
       isBtnDisabled,
