@@ -1,5 +1,11 @@
 # Project Quiz Game
 
+## Preview
+<video>
+  <source src="./preview.demo.webm"
+    type="video/webm">
+</video>
+
 ### Tools
 - Handle (questions & results) json data from firebase api
 - Compress images to webp format from squoosh cli package
@@ -19,6 +25,3 @@
 ### Technologies
 - Vue 3 with vue CLI
 - Firebase Real Time Database
-
-Preview
-> Link [here]()
